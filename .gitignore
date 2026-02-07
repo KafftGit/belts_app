@@ -1,0 +1,7 @@
+belts/config/.env
+.idea
+venv
+.venv
+.env
+/venv
+/.idea
