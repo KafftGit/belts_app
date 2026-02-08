@@ -1,0 +1,44 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FABIS CRAFT - Вход</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+</head>
+<body>
+    {% include "includes/header.html" %}
+
+    <main class="main">
+        <div class="container auth-wrap">
+            <section class="card">
+                <h1 class="card__title">Вход в аккаунт</h1>
+
+                {% if error %}
+                    <p style="color:#ffb4a6; margin:0 0 12px;">{{ error }}</p>
+                {% endif %}
+
+                <form class="form" action="{% url 'user-login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form__row">
+                        <label class="label" for="username">Username</label>
+                        <input class="input" id="username" name="username" type="text" placeholder="your_username" required />
+                    </div>
+
+                    <div class="form__row">
+                        <label class="label" for="password">Пароль</label>
+                        <input class="input" id="password" name="password" type="password" placeholder="••••••••" required />
+                    </div>
+
+                    <button class="btn btn--primary full" type="submit">Войти</button>
+
+                    <div class="helper">
+                        <a href="{% url 'user-register' %}">Нет аккаунта? Зарегистрироваться</a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

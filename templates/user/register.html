@@ -1,0 +1,58 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FABIS CRAFT - Регистрация</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+</head>
+<body>
+    {% include "includes/header.html" %}
+
+    <main class="main">
+        <div class="container auth-wrap">
+            <section class="card">
+                <h1 class="card__title">Создать аккаунт</h1>
+
+                {% if error %}
+                    <p style="color:#ffb4a6; margin:0 0 12px;">{{ error }}</p>
+                {% endif %}
+
+                {% if success %}
+                    <p style="color:#8ef0b0; margin:0 0 12px;">{{ success }}</p>
+                {% endif %}
+
+                <form class="form" action="{% url 'user-register' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form__row">
+                        <label class="label" for="username">Имя пользователя</label>
+                        <input class="input" id="username" name="username" type="text" placeholder="example" required />
+                    </div>
+
+                    <div class="form__row">
+                        <label class="label" for="email">Эл. почта</label>
+                        <input class="input" id="email" name="email" type="email" placeholder="you@example.com" />
+                    </div>
+
+                    <div class="form__row">
+                        <label class="label" for="password">Пароль</label>
+                        <input class="input" id="password" name="password" type="password" placeholder="Минимум 8 символов" minlength="8" required />
+                    </div>
+
+                    <div class="form__row">
+                        <label class="label" for="confirm_password">Подтвердите пароль</label>
+                        <input class="input" id="confirm_password" name="confirm_password" type="password" placeholder="Повторите пароль" minlength="8" required />
+                    </div>
+
+                    <button class="btn btn--primary full" type="submit">Войти</button>
+
+                    <div class="helper">
+                        <a href="{% url 'user-login' %}">Уже есть аккаунт? Войти</a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
