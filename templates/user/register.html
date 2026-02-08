@@ -15,10 +15,6 @@
             <section class="card">
                 <h1 class="card__title">Создать аккаунт</h1>
 
-                {% if error %}
-                    <p style="color:#ffb4a6; margin:0 0 12px;">{{ error }}</p>
-                {% endif %}
-
                 {% if success %}
                     <p style="color:#8ef0b0; margin:0 0 12px;">{{ success }}</p>
                 {% endif %}
@@ -26,26 +22,42 @@
                 <form class="form" action="{% url 'user-register' %}" method="post">
                     {% csrf_token %}
                     <div class="form__row">
-                        <label class="label" for="username">Имя пользователя</label>
-                        <input class="input" id="username" name="username" type="text" placeholder="example" required />
+                        <label class="label" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        {{ form.username }}
+                        {% for field_error in form.username.errors %}
+                            <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
+                        {% endfor %}
                     </div>
 
                     <div class="form__row">
-                        <label class="label" for="email">Эл. почта</label>
-                        <input class="input" id="email" name="email" type="email" placeholder="you@example.com" />
+                        <label class="label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% for field_error in form.email.errors %}
+                            <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
+                        {% endfor %}
                     </div>
 
                     <div class="form__row">
-                        <label class="label" for="password">Пароль</label>
-                        <input class="input" id="password" name="password" type="password" placeholder="Минимум 8 символов" minlength="8" required />
+                        <label class="label" for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                        {{ form.password1 }}
+                        {% for field_error in form.password1.errors %}
+                            <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
+                        {% endfor %}
                     </div>
 
                     <div class="form__row">
-                        <label class="label" for="confirm_password">Подтвердите пароль</label>
-                        <input class="input" id="confirm_password" name="confirm_password" type="password" placeholder="Повторите пароль" minlength="8" required />
+                        <label class="label" for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                        {{ form.password2 }}
+                        {% for field_error in form.password2.errors %}
+                            <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
+                        {% endfor %}
                     </div>
 
-                    <button class="btn btn--primary full" type="submit">Войти</button>
+                    {% for non_field_error in form.non_field_errors %}
+                        <p style="color:#ffb4a6; margin:0 0 12px;">{{ non_field_error }}</p>
+                    {% endfor %}
+
+                    <button class="btn btn--primary full" type="submit">Зарегистрироваться</button>
 
                     <div class="helper">
                         <a href="{% url 'user-login' %}">Уже есть аккаунт? Войти</a>
