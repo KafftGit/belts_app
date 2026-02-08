@@ -1,0 +1,21 @@
+{% load static %}
+<header class="header">
+    <div class="container header__inner">
+        <a class="brand" href="{% url 'home-page' %}" aria-label="На главную">
+            <img src="{% static 'logo.jpg' %}" alt="FABIS CRAFT logo" class="brand__icon" />
+            <span>FABIS CRAFT</span>
+        </a>
+
+        <nav class="nav-actions" aria-label="Аккаунт">
+            {% if request.user.is_authenticated %}
+                <form class="nav-form" method="post" action="{% url 'user-logout' %}">
+                    {% csrf_token %}
+                    <button class="btn" type="submit">Выйти</button>
+                </form>
+            {% else %}
+                <a class="btn" href="{% url 'user-login' %}">Вход</a>
+                <a class="btn" href="{% url 'user-register' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>

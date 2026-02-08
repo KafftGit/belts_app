@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FABIS CRAFT - Выход</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+</head>
+<body>
+    {% include "includes/header.html" %}
+
+    <main class="main">
+        <div class="container auth-wrap">
+            <section class="card">
+                <h1 class="card__title">Выход из аккаунта</h1>
+
+                {% if request.user.is_authenticated %}
+                    <p style="margin:0 0 12px;">Вы вошли как <strong>{{ request.user.username }}</strong>.</p>
+                    <form method="post" action="{% url 'user-logout' %}">
+                        {% csrf_token %}
+                        <button class="btn btn--primary full" type="submit">Выйти</button>
+                    </form>
+                {% else %}
+                    <p style="margin:0 0 12px;">Вы не авторизованы.</p>
+                    <a class="btn" href="{% url 'user-login' %}">Перейти ко входу</a>
+                {% endif %}
+
+                {% if success %}
+                    <p style="color:#8ef0b0; margin:12px 0 0;">{{ success }}</p>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+</body>
+</html>
