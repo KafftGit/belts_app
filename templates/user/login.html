@@ -1,0 +1,50 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FABIS CRAFT - Вход</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+</head>
+<body>
+    {% include "includes/header.html" %}
+
+    <main class="main">
+        <div class="container auth-wrap">
+            <section class="card">
+                <h1 class="card__title">Вход в аккаунт</h1>
+
+                <form class="form" action="{% url 'user-login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form__row">
+                        <label class="label" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        {{ form.username }}
+                        {% for field_error in form.username.errors %}
+                            <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form__row">
+                        <label class="label" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        {{ form.password }}
+                        {% for field_error in form.password.errors %}
+                            <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    {% for non_field_error in form.non_field_errors %}
+                        <p style="color:#ffb4a6; margin:0 0 12px;">{{ non_field_error }}</p>
+                    {% endfor %}
+
+                    <button class="btn btn--primary full" type="submit">Войти</button>
+
+                    <div class="helper">
+                        <a href="{% url 'user-register' %}">Нет аккаунта? Зарегистрироваться</a>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+</body>
+</html>
