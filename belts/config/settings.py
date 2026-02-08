@@ -25,12 +25,12 @@ load_dotenv(CONFIG_DIR / ".env")
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", )
+SECRET_KEY = os.getenv("SECRET_KEY", )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "False")
+DEBUG = os.getenv("DEBUG", "False")
 
-ALLOWED_HOSTS = [host for host in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")]
+ALLOWED_HOSTS = [host for host in os.getenv("ALLOWED_HOSTS", "").split(",")]
 
 # Application definition
 
@@ -125,6 +125,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'belts' / 'static',
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
