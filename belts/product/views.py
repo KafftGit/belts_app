@@ -6,6 +6,7 @@ from belts.product.models import Product
 class ProductListView(ListView):
     model = Product
     template_name = "home.html"
+    paginate_by = 4
 
     def get_queryset(self):
         return Product.objects.filter(available=True).prefetch_related("images").order_by("name")

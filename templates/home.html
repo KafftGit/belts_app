@@ -42,6 +42,17 @@
                 </div>
               {% endfor %}
             </div>
+            {% if is_paginated %}
+              <div class="pagination">
+                {% if page_obj.has_previous %}
+                  <a class="pagination__link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+                {% endif %}
+                <span class="pagination__info">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                  <a class="pagination__link" href="?page={{ page_obj.next_page_number }}">Вперёд</a>
+                {% endif %}
+              </div>
+            {% endif %}
           {% else %}
             <p class="sub">Пока нет товаров.</p>
           {% endif %}
