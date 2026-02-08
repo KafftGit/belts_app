@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ object.name }}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+{% include "includes/header.html" %}
+
+<main class="container">
+
+    <div class="product-card product-card--detail product-detail">
+
+        <div class="product-image carousel" data-carousel>
+            <button class="carousel-btn carousel-btn--prev" type="button" aria-label="Предыдущее изображение">‹</button>
+            <button class="carousel-btn carousel-btn--next" type="button" aria-label="Следующее изображение">›</button>
+
+            <div class="carousel-track">
+                {% for image in object.images.all %}
+                    <img src="{{ image.image.url }}" alt="{{ object.name }}" class="carousel-item">
+                {% empty %}
+                    <img src="{% static 'logo.jpg' %}" alt="{{ object.name }}" class="carousel-item">
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="product-info">
+            {% if object.category %}
+                <div class="category">{{ object.category.name|capfirst }}</div>
+            {% endif %}
+            <h1 class="product-title">{{ object.name }}</h1>
+
+            <div class="price">{{ object.price }} ₽</div>
+
+            <p class="description">
+                {{ object.description }}
+            </p>
+
+            <div class="product-actions">
+                <button class="buy-btn">Добавить в корзину</button>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>
+<script>
+    (function () {
+        const carousel = document.querySelector("[data-carousel]");
+        if (!carousel) return;
+
+        const items = carousel.querySelectorAll(".carousel-item");
+        const prevBtn = carousel.querySelector(".carousel-btn--prev");
+        const nextBtn = carousel.querySelector(".carousel-btn--next");
+        let index = 0;
+
+        const render = () => {
+            items.forEach((item, i) => {
+                item.style.display = i === index ? "block" : "none";
+            });
+        };
+
+        prevBtn.addEventListener("click", () => {
+            index = (index - 1 + items.length) % items.length;
+            render();
+        });
+
+        nextBtn.addEventListener("click", () => {
+            index = (index + 1) % items.length;
+            render();
+        });
+
+        render();
+    })();
+</script>
