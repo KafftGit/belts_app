@@ -5,11 +5,14 @@ from belts.product.models import Product
 
 class ProductListView(ListView):
     model = Product
+    template_name = "home.html"
 
     def get_queryset(self):
-        return Product.objects.filter(available=True)
+        return Product.objects.filter(available=True).prefetch_related("images").order_by("name")
 
 
 class ProductDetailView(DetailView):
     model = Product
-    pk_url_kwarg = "product_id"
+    slug_field = "slug"
+    slug_url_kwarg = "slug"
+    template_name = "product/detail.html"

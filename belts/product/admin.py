@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from belts.product.models import Product, ProductImage
+from belts.product.models import Product, Category, ProductImage
 
 
 class ProductImageInline(admin.TabularInline):
@@ -14,3 +14,4 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ProductImage)
+admin.site.register(Category)

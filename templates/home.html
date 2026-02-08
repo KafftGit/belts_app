@@ -21,6 +21,32 @@
         <p class="sub">Премиальные материалы, надёжная фурнитура и строгий стиль — ремень, который выглядит дорого каждый день.</p>
       </section>
 
+      <section class="products">
+        <div class="container">
+          <h2 class="section-title section-title--center">Наши товары</h2>
+
+          {% if object_list %}
+            <div class="product-grid">
+              {% for product in object_list %}
+                <div class="product-card product-card--list">
+                  {% if product.main_image %}
+                    <a class="product-image" href="{% url 'product-detail' product.slug %}">
+                      <img src="{{ product.main_image.image.url }}" alt="{{ product.name }}">
+                    </a>
+                  {% endif %}
+
+                  <div class="product-info">
+                    <a class="product-title" href="{% url 'product-detail' product.slug %}">{{ product.name }}</a>
+                    <p class="price">{{ product.price }} ₽</p>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="sub">Пока нет товаров.</p>
+          {% endif %}
+        </div>
+      </section>
     </div>
 
     <div class="container footer">

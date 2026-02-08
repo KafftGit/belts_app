@@ -3,6 +3,6 @@ from django.urls import path
 from belts.product.views import ProductDetailView, ProductListView
 
 urlpatterns = [
-    path("products/", ProductListView.as_view(), name="product-list"),
-    path("products/<int:product_id>/", ProductDetailView.as_view(), name="product-detail"),
+    path("", ProductListView.as_view(), name="home-page"),
+    path("products/<slug:slug>/", ProductDetailView.as_view(), name="product-detail"),
 ]
