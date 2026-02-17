@@ -8,6 +8,8 @@
 
         <nav class="nav-actions" aria-label="Аккаунт">
             {% if request.user.is_authenticated %}
+                <span class="kicker" style="letter-spacing:.08em;">{{ request.user.username }}</span>
+                <a class="btn" href="{% url 'order-list' %}">Мои заказы</a>
                 <form class="nav-form" method="post" action="{% url 'user-logout' %}">
                     {% csrf_token %}
                     <button class="btn" type="submit">Выйти</button>
