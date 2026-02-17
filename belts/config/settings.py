@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'belts.user',
     'belts.product',
+    'belts.order',
 ]
 
 MIDDLEWARE = [
