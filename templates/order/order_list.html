@@ -1,0 +1,93 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FABIS CRAFT — Заказы</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}" />
+</head>
+<body>
+  {% include "includes/header.html" %}
+
+  <main class="main main--home">
+    <div class="container">
+      <section class="products">
+        <h2 class="section-title section-title--center">Мои заказы</h2>
+
+        {% if object_list %}
+          {% for order in object_list %}
+            <div class="card" style="margin-bottom:24px;">
+              <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                <div>
+                  <div class="kicker">Заказ #{{ order.id }}</div>
+                  <div style="font-weight:700; font-size:18px;">
+                    {% with status=order.status %}
+                      {% if status == "NEW" %}
+                        Новый
+                      {% elif status == "APPROVED" %}
+                        Подтвержден
+                      {% elif status == "DECLINED" %}
+                        Отказано
+                      {% elif status == "CANCELED" %}
+                        Отменен
+                      {% elif status == "DONE" %}
+                        Выполнен
+                      {% elif status == "PROCESSING" %}
+                        В процессе
+                      {% else %}
+                        {{ status }}
+                      {% endif %}
+                    {% endwith %}
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <div class="sub" style="margin:0;">Сумма: <strong>{{ order.total_price }} ₽</strong></div>
+                  <div class="sub" style="margin:0;">Кол-во: <strong>{{ order.quantity }}</strong></div>
+                </div>
+              </div>
+
+              {% if order.items.all %}
+                <div class="product-grid" style="grid-template-columns: repeat(3, minmax(240px, 1fr));">
+                  {% for item in order.items.all %}
+                    <div class="product-card product-card--list">
+                      <a class="product-image" href="{% url 'product-detail' item.product.slug %}">
+                        {% if item.product.main_image %}
+                          <img src="{{ item.product.main_image.image.url }}" alt="{{ item.product.name }}" style="height:140px;">
+                        {% else %}
+                          <img src="{% static 'logo.jpg' %}" alt="{{ item.product.name }}" style="height:140px;">
+                        {% endif %}
+                      </a>
+                      <div class="product-info">
+                        <a class="product-title" href="{% url 'product-detail' item.product.slug %}">{{ item.product.name }}</a>
+                        <div class="sub" style="margin:0;">Кол-во: {{ item.quantity }}</div>
+                        <div class="price">{{ item.total_price }} ₽</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="sub">В заказе нет товаров.</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          {% if is_paginated %}
+            <div class="pagination">
+              {% if page_obj.has_previous %}
+                <a class="pagination__link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+              {% endif %}
+              <span class="pagination__info">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+              {% if page_obj.has_next %}
+                <a class="pagination__link" href="?page={{ page_obj.next_page_number }}">Вперёд</a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% else %}
+          <p class="sub">У вас пока нет заказов.</p>
+        {% endif %}
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -5,7 +5,8 @@ from django.views import View
 from django.views.generic import DetailView, ListView
 
 from belts.order.models import Order, Status
-from mixins import IsUserOwnerOfModelMixin
+from belts.order.manager import OrderViewManager
+from belts.mixins import IsUserOwnerOfModelMixin
 
 
 class OrderDetailView(IsUserOwnerOfModelMixin, DetailView):
@@ -21,7 +22,8 @@ class OrderListView(LoginRequiredMixin, ListView):
 
 
 class OrderCreateView(LoginRequiredMixin, View):
-    pass
+    def post(self, request):
+        return OrderViewManager.create(request)
 
 
 class OrderCancelView(IsUserOwnerOfModelMixin, View):
@@ -31,4 +33,4 @@ class OrderCancelView(IsUserOwnerOfModelMixin, View):
 
         order.status = Status.CANCELED
         order.save()
-        return JsonResponse({}, status=200)
+        return JsonResponse({'status': 'success'}, status=200)

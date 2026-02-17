@@ -25,7 +25,7 @@ class Product(models.Model):
     )
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    price = models.IntegerField()
+    price = models.PositiveIntegerField()
     available = models.BooleanField(default=True)
     stock_quantity = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

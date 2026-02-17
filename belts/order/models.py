@@ -8,6 +8,7 @@ class Status(models.TextChoices):
     CANCELED = "CANCELED", "Canceled"
     DONE = "DONE", "Done"
     NEW = "NEW", "New"
+    PROCESSING = "PROCESSING", "Processing"
 
 
 class Order(models.Model):
@@ -42,3 +43,4 @@ class OrderItem(models.Model):
     )
     quantity = models.PositiveIntegerField()
     unit_price = models.PositiveIntegerField()
+    total_price = models.PositiveIntegerField()
