@@ -1,6 +1,6 @@
 from django import forms
 
-from product.models import Product
+from belts.product.models import Product
 
 
 def validate_user_items(items: list) -> dict:

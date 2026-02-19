@@ -1,8 +1,8 @@
 from django.db import transaction
 from django.http import JsonResponse
 
-from cart.forms import CartCreateForm, CartItemDeleteForm
-from cart.models import Cart, CartItem
+from belts.cart.forms import CartCreateForm, CartItemDeleteForm
+from belts.cart.models import Cart, CartItem
 
 
 class CartViewManager:

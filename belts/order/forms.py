@@ -1,6 +1,6 @@
 from django import forms
 
-from utils.validators import validate_user_items
+from belts.utils.validators import validate_user_items
 
 
 class OrderCreateForm(forms.Form):
