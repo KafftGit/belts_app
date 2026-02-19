@@ -68,9 +68,11 @@
               {% else %}
                 <p class="sub">В заказе нет товаров.</p>
               {% endif %}
-              <div style="display:flex; justify-content:flex-end; margin-top:18px;">
-                <a class="btn btn--ghost" href="{% url 'order-cancel' order.id %}">Отменить заказ</a>
-              </div>
+              {% if order.status == "NEW" %}
+                <div style="display:flex; justify-content:flex-end; margin-top:18px;">
+                  <a class="btn btn--ghost" href="{% url 'order-cancel' order.id %}" data-order-cancel>Отменить заказ</a>
+                </div>
+              {% endif %}
             </div>
           {% endfor %}
 
@@ -91,5 +93,22 @@
       </section>
     </div>
   </main>
+  <script>
+    (function () {
+      const cancelButtons = document.querySelectorAll("[data-order-cancel]");
+      if (!cancelButtons.length) return;
+
+      cancelButtons.forEach((button) => {
+        button.addEventListener("click", async (event) => {
+          event.preventDefault();
+          try {
+            await fetch(button.href, { method: "GET" });
+          } finally {
+            window.location.reload();
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

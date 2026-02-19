@@ -27,6 +27,7 @@ class OrderCreateView(LoginRequiredMixin, View):
 
 
 class OrderCancelView(IsUserOwnerOfModelMixin, DetailView):
+    model = Order
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
