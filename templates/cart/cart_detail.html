@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FABIS CRAFT — Корзина</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}" />
+</head>
+<body>
+  {% include "includes/header.html" %}
+
+  <main class="main main--home">
+    <div class="container">
+      <section class="products">
+        <h2 class="section-title section-title--center">Моя корзина</h2>
+
+        <div class="card" style="margin-bottom:24px;">
+          <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <div>
+              <div style="font-weight:700; font-size:18px;">Текущие товары</div>
+            </div>
+            <div style="text-align:right;"></div>
+          </div>
+
+          {% if object.items.all %}
+            <div class="product-grid" style="grid-template-columns: repeat(3, minmax(240px, 1fr));">
+              {% for item in object.items.all %}
+                <div class="product-card product-card--list">
+                  <a class="product-image" href="{% url 'product-detail' item.product.slug %}">
+                    {% if item.product.main_image %}
+                      <img src="{{ item.product.main_image.image.url }}" alt="{{ item.product.name }}" style="height:140px;">
+                    {% else %}
+                      <img src="{% static 'logo.jpg' %}" alt="{{ item.product.name }}" style="height:140px;">
+                    {% endif %}
+                  </a>
+                  <div class="product-info">
+                    <a class="product-title" href="{% url 'product-detail' item.product.slug %}">{{ item.product.name }}</a>
+                    <div class="sub" style="margin:0;">Кол-во: {{ item.quantity }}</div>
+                    <div class="price">
+                      Итого: {% widthratio item.unit_price 1 item.quantity %} ₽
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:28px;">
+              <div class="product-title" style="margin:0;">Стоимость товаров:</div>
+              <div style="font-weight:700;">{{ cart_total_price }} ₽</div>
+            </div>
+          {% else %}
+            <p class="sub">В корзине нет товаров.</p>
+          {% endif %}
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

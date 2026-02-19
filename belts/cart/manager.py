@@ -3,6 +3,7 @@ from django.http import JsonResponse
 
 from belts.cart.forms import CartCreateForm, CartItemDeleteForm
 from belts.cart.models import Cart, CartItem
+from belts.product.models import Product
 
 
 class CartViewManager:
@@ -18,15 +19,23 @@ class CartViewManager:
         with transaction.atomic():
             cart, _ = Cart.objects.get_or_create(user=request.user)
 
-            CartItem.objects.create(
-                cart=cart,
-                **form.cleaned_data
-            )
+            product = Product.objects.get(id=form.cleaned_data["product"])
+
+            try:
+                item = CartItem.objects.get(product=product, cart=cart)
+                item.quantity = form.cleaned_data["quantity"]
+                item.unit_price = form.cleaned_data["unit_price"]
+                item.save()
+            except CartItem.DoesNotExist:
+                CartItem.objects.create(
+                    cart=cart,
+                    **form.cleaned_data
+                )
 
         return JsonResponse({"id": cart.id}, status=201)
 
-    def update(self, request):
-        data = request.POST
+    def update(self, request, data=None):
+        data = data or request.POST
 
         form = CartCreateForm(data)
 
@@ -36,7 +45,9 @@ class CartViewManager:
         with transaction.atomic():
             cart, _ = Cart.objects.get_or_create(user=request.user)
 
-            item = CartItem.objects.get(product=form.cleaned_data["product"], cart=cart)
+            product = Product.objects.get(id=form.cleaned_data["product"])
+
+            item = CartItem.objects.get(product=product, cart=cart)
 
             item.quantity = form.cleaned_data["quantity"]
             item.unit_price = form.cleaned_data["unit_price"]
@@ -55,6 +66,8 @@ class CartViewManager:
         with transaction.atomic():
             cart, _ = Cart.objects.get_or_create(user=request.user)
 
-            CartItem.objects.get(product=form.cleaned_data["product"], cart=cart).delete()
+            product = Product.objects.get(id=form.cleaned_data["product"])
+
+            CartItem.objects.get(product=product, cart=cart).delete()
 
         return JsonResponse({"id": cart.id}, status=201)
