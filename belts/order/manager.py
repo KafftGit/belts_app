@@ -18,7 +18,7 @@ class OrderViewManager:
         if not form.is_valid():
             return JsonResponse({"errors": form.errors}, status=400)
 
-        order_items = form.cleaned_data["order_items"]
+        product_items = form.cleaned_data["product_items"]
         total_quantity = form.cleaned_data["total_quantity"]
         total_price = form.cleaned_data["total_price"]
         address = form.cleaned_data["address"]
@@ -41,7 +41,7 @@ class OrderViewManager:
                         unit_price=item["product"].price,
                         total_price=item["total_price"],
                     )
-                    for item in order_items
+                    for item in product_items
                 ]
             )
 

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'belts.user',
     'belts.product',
     'belts.order',
+    'belts.cart',
 ]
 
 MIDDLEWARE = [
