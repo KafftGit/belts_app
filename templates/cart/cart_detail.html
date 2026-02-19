@@ -56,9 +56,8 @@
               <div class="product-title" style="margin:0;">Стоимость товаров:</div>
               <div style="font-weight:700;">{{ cart_total_price }} ₽</div>
             </div>
-            <form method="post" action="{% url 'order-create' %}" class="cart-order-form" style="margin-top:18px;">
+            <form method="post" action="{% url 'cart-complete' %}" class="cart-order-form" style="margin-top:18px;">
               {% csrf_token %}
-              <input type="hidden" name="items" value='[{% for item in object.items.all %}{"product_id":{{ item.product.id }},"quantity":{{ item.quantity }}}{% if not forloop.last %},{% endif %}{% endfor %}]'>
               <input type="hidden" name="next" value="{% url 'cart' %}">
               <div class="form__row">
                 <label class="label" for="order-address">Адрес доставки</label>
@@ -111,6 +110,27 @@
             window.location.reload();
           }
         });
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      const orderForm = document.querySelector(".cart-order-form");
+      if (!orderForm) return;
+
+      orderForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(orderForm);
+
+        try {
+          await fetch(orderForm.action, {
+            method: "POST",
+            body: new URLSearchParams(formData),
+          });
+        } finally {
+          window.location.href = "{% url 'home-page' %}";
+        }
       });
     })();
   </script>

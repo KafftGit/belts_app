@@ -587,6 +587,8 @@ a{ color:inherit; text-decoration:none; }
 .cart-form__qty{
   width:64px;
   height:38px;
+  box-sizing:border-box;
+  box-sizing:border-box;
   padding:0 8px;
   border-radius:10px;
   border:1px solid rgba(200,140,110,.35);
@@ -596,7 +598,7 @@ a{ color:inherit; text-decoration:none; }
   text-align:center;
 }
 .buy-btn{
-  height:48px;
+  height:38px;
   padding:0 18px;
   border-radius:12px;
   border:1px solid rgba(200,140,110,.35);

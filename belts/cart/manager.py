@@ -78,7 +78,7 @@ class CartViewManager:
             return JsonResponse({"errors": form.errors}, status=400)
 
         items = CartItem.objects.filter(cart__user=request.user)
-        items_total_price = items.aggregate(Sum("total_price"))["total_price__sum"]
+        items_total_price = items.aggregate(Sum("unit_price"))["unit_price__sum"]
 
         with transaction.atomic():
             order = Order.objects.create(
@@ -99,5 +99,7 @@ class CartViewManager:
                     for item in items
                 ]
             )
+
+        items.delete()
 
         return JsonResponse({"id": order.id}, status=201)
