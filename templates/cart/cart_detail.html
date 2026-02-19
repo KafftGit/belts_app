@@ -56,6 +56,22 @@
               <div class="product-title" style="margin:0;">Стоимость товаров:</div>
               <div style="font-weight:700;">{{ cart_total_price }} ₽</div>
             </div>
+            <form method="post" action="{% url 'order-create' %}" class="cart-order-form" style="margin-top:18px;">
+              {% csrf_token %}
+              <input type="hidden" name="items" value='[{% for item in object.items.all %}{"product_id":{{ item.product.id }},"quantity":{{ item.quantity }}}{% if not forloop.last %},{% endif %}{% endfor %}]'>
+              <input type="hidden" name="next" value="{% url 'cart' %}">
+              <div class="form__row">
+                <label class="label" for="order-address">Адрес доставки</label>
+                <input class="input" id="order-address" name="address" type="text" required>
+              </div>
+              <div class="form__row order-field--spaced">
+                <label class="label" for="order-notes">Комментарий</label>
+                <input class="input" id="order-notes" name="extra_notes" type="text">
+              </div>
+              <div class="order-actions">
+                <button class="btn btn--primary" type="submit">Оформить заказ</button>
+              </div>
+            </form>
           {% else %}
             <p class="sub">В корзине нет товаров.</p>
           {% endif %}

@@ -22,7 +22,6 @@ class Order(models.Model):
         choices=Status.choices,
         default=Status.NEW,
     )
-    quantity = models.PositiveIntegerField()
     total_price = models.PositiveIntegerField()
     address = models.TextField()
     extra_notes = models.TextField(blank=True)

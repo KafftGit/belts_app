@@ -9,3 +9,8 @@ class CartCreateForm(forms.Form):
 
 class CartItemDeleteForm(forms.Form):
     product = forms.IntegerField(widget=forms.HiddenInput())
+
+
+class CartCompleteForm(forms.Form):
+    address = forms.CharField()
+    extra_notes = forms.CharField(required=False)
