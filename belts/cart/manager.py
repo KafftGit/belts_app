@@ -3,7 +3,6 @@ from django.http import JsonResponse
 
 from belts.cart.forms import CartCreateForm, CartItemDeleteForm
 from belts.cart.models import Cart, CartItem
-from belts.product.models import Product
 
 
 class CartViewManager:
@@ -19,17 +18,17 @@ class CartViewManager:
         with transaction.atomic():
             cart, _ = Cart.objects.get_or_create(user=request.user)
 
-            product = Product.objects.get(id=form.cleaned_data["product"])
-
             try:
-                item = CartItem.objects.get(product=product, cart=cart)
-                item.quantity = form.cleaned_data["quantity"]
+                item = CartItem.objects.get(product_id=form.cleaned_data["product"], cart=cart)
+                item.quantity += form.cleaned_data["quantity"]
                 item.unit_price = form.cleaned_data["unit_price"]
                 item.save()
             except CartItem.DoesNotExist:
                 CartItem.objects.create(
                     cart=cart,
-                    **form.cleaned_data
+                    product_id=form.cleaned_data["product"],
+                    quantity=form.cleaned_data["quantity"],
+                    unit_price=form.cleaned_data["unit_price"],
                 )
 
         return JsonResponse({"id": cart.id}, status=201)
@@ -45,9 +44,7 @@ class CartViewManager:
         with transaction.atomic():
             cart, _ = Cart.objects.get_or_create(user=request.user)
 
-            product = Product.objects.get(id=form.cleaned_data["product"])
-
-            item = CartItem.objects.get(product=product, cart=cart)
+            item = CartItem.objects.get(product_id=form.cleaned_data["product"], cart=cart)
 
             item.quantity = form.cleaned_data["quantity"]
             item.unit_price = form.cleaned_data["unit_price"]
@@ -55,8 +52,8 @@ class CartViewManager:
 
         return JsonResponse({"id": cart.id}, status=201)
 
-    def delete(self, request):
-        data = request.POST
+    def delete(self, request, data=None):
+        data = data or request.POST
 
         form = CartItemDeleteForm(data)
 
@@ -66,8 +63,6 @@ class CartViewManager:
         with transaction.atomic():
             cart, _ = Cart.objects.get_or_create(user=request.user)
 
-            product = Product.objects.get(id=form.cleaned_data["product"])
-
-            CartItem.objects.get(product=product, cart=cart).delete()
+            CartItem.objects.get(product_id=form.cleaned_data["product"], cart=cart).delete()
 
         return JsonResponse({"id": cart.id}, status=201)

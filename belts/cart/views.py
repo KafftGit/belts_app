@@ -1,12 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import QueryDict
 from django.db.models import F, IntegerField, Sum
+from django.http import QueryDict
 from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import DetailView
 
 from belts.cart.manager import CartViewManager
-from belts.cart.models import Cart
+from belts.cart.models import Cart, CartItem
 
 
 class CartDetailView(LoginRequiredMixin, DetailView):
@@ -38,4 +38,14 @@ class CartCreateView(LoginRequiredMixin, View):
         return CartViewManager().update(request, data=data)
 
     def delete(self, request):
-        return CartViewManager().delete(request)
+        return CartItem.objects.filter(cart_id=request.session["cart_id"]).delete()
+
+
+class CartItemView(LoginRequiredMixin, View):
+    def delete(self, request):
+        data = QueryDict(request.body)
+        response = CartViewManager().delete(request, data=data)
+        next_url = data.get("next") or request.GET.get("next")
+        if next_url:
+            return redirect(next_url)
+        return response

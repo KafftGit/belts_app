@@ -430,6 +430,31 @@ a{ color:inherit; text-decoration:none; }
   display:block;
   margin-bottom:10px;
 }
+.product-image-wrap{
+  position:relative;
+}
+.cart-item-remove{
+  position:absolute;
+  top:8px;
+  right:8px;
+  margin:0;
+}
+.cart-item-remove__btn{
+  width:28px;
+  height:28px;
+  border:none;
+  background: rgba(0,0,0,.55);
+  color:#fff;
+  border-radius:999px;
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+  padding:0;
+}
+.cart-item-remove__btn:focus-visible{
+  outline:none;
+  box-shadow: 0 0 0 3px rgba(255,255,255,.25);
+}
 .product-card--list img{
   width:100%;
   height:200px;
