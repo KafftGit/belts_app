@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'belts.user',
     'belts.product',
     'belts.order',
+    'belts.cart',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'belts.cart.context_processors.cart_items_count',
             ],
         },
     },

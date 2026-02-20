@@ -26,11 +26,13 @@ class OrderCreateView(LoginRequiredMixin, View):
         return OrderViewManager.create(request)
 
 
-class OrderCancelView(IsUserOwnerOfModelMixin, View):
+class OrderCancelView(IsUserOwnerOfModelMixin, DetailView):
+    model = Order
 
-    def get(self, request, pk):
-        order = get_object_or_404(Order, pk=pk)
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.status = Status.CANCELED
+        self.object.save()
 
-        order.status = Status.CANCELED
-        order.save()
-        return JsonResponse({'status': 'success'}, status=200)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)

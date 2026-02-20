@@ -37,7 +37,17 @@
 
                   <div class="product-info">
                     <a class="product-title" href="{% url 'product-detail' product.slug %}">{{ product.name }}</a>
-                    <p class="price">{{ product.price }} ₽</p>
+                    <div class="product-meta">
+                      <p class="price">{{ product.price }} ₽</p>
+                      <form class="cart-form cart-form--inline" method="post" action="{% url 'cart-create' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="product" value="{{ product.id }}">
+                        <input type="hidden" name="unit_price" value="{{ product.price }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <button class="buy-btn buy-btn--inline" type="submit">Добавить в корзину</button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               {% endfor %}
