@@ -1,14 +1,12 @@
-import json
-
 from django.db import transaction
 from django.http import JsonResponse
 
+from belts.cart.models import CartItem
 from belts.order.forms import OrderCreateForm
 from belts.order.models import Order, OrderItem
 
 
 class OrderViewManager:
-
 
     @staticmethod
     def create(request):
@@ -18,8 +16,7 @@ class OrderViewManager:
         if not form.is_valid():
             return JsonResponse({"errors": form.errors}, status=400)
 
-        order_items = form.cleaned_data["order_items"]
-        total_quantity = form.cleaned_data["total_quantity"]
+        product_items = form.cleaned_data["product_items"]
         total_price = form.cleaned_data["total_price"]
         address = form.cleaned_data["address"]
         extra_notes = form.cleaned_data["extra_notes"]
@@ -27,7 +24,6 @@ class OrderViewManager:
         with transaction.atomic():
             order = Order.objects.create(
                 user=request.user,
-                quantity=total_quantity,
                 total_price=total_price,
                 address=address,
                 extra_notes=extra_notes,
@@ -41,7 +37,7 @@ class OrderViewManager:
                         unit_price=item["product"].price,
                         total_price=item["total_price"],
                     )
-                    for item in order_items
+                    for item in product_items
                 ]
             )
 

@@ -14,6 +14,10 @@
                     {% csrf_token %}
                     <button class="btn" type="submit">Выйти</button>
                 </form>
+                <a class="btn btn--ghost cart-link" href="{% url 'cart' %}" aria-label="Корзина">
+                    <span class="cart-emoji" aria-hidden="true">📦</span>
+                    <span class="cart-count">{{ cart_items_count }}</span>
+                </a>
             {% else %}
                 <a class="btn" href="{% url 'user-login' %}">Вход</a>
                 <a class="btn" href="{% url 'user-register' %}">Регистрация</a>

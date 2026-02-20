@@ -40,7 +40,25 @@
             </p>
 
             <div class="product-actions">
-                <button class="buy-btn">Добавить в корзину</button>
+                <form class="cart-form" method="post" action="{% url 'cart-create' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="product" value="{{ object.id }}">
+                    <input type="hidden" name="unit_price" value="{{ object.price }}">
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <div class="cart-form__row">
+                        <input
+                            class="cart-form__qty"
+                            type="number"
+                            name="quantity"
+                            value="1"
+                            min="1"
+                            {% if object.stock_quantity and object.stock_quantity > 1 %}max="{{ object.stock_quantity }}"{% endif %}
+                            step="1"
+                            aria-label="Количество"
+                        >
+                        <button class="buy-btn" type="submit">Добавить в корзину</button>
+                    </div>
+                </form>
             </div>
         </div>
 
