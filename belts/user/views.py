@@ -16,3 +16,4 @@ def logout_view(request):
 @require_http_methods(["GET", "POST"])
 def register_view(request):
     return UserViewManager.register(request)
+

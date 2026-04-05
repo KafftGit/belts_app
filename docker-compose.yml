@@ -2,7 +2,10 @@ services:
   db:
     image: postgres:16.1
     container_name: belts-postgres
-    env_file:
-      - belts/config/.env
+    environment:
+      POSTGRES_DB: "belts_db"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
     ports:
-      - "5432:5432"
+      - "5433:5432"
+   

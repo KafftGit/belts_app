@@ -38,3 +38,4 @@ class UserViewManager:
         login(request, form.save())
 
         return redirect("home-page")
+

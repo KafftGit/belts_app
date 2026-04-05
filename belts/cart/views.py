@@ -1,9 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import F, IntegerField, Sum
+from django.db.models import F, Sum, DecimalField
 from django.http import QueryDict
 from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import DetailView
+
 
 from belts.cart.manager import CartViewManager
 from belts.cart.models import Cart, CartItem
@@ -19,7 +20,10 @@ class CartDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         items = self.object.items.all()
         total_price = items.aggregate(
-            total=Sum(F("unit_price") * F("quantity"), output_field=IntegerField())
+            total=Sum(
+                F("unit_price") * F("quantity"),
+                output_field=DecimalField(max_digits=10, decimal_places=2)
+            )
         )["total"] or 0
         context["cart_total_price"] = total_price
         return context

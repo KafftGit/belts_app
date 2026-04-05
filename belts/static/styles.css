@@ -653,6 +653,7 @@ a{ color:inherit; text-decoration:none; }
     height:380px;
   }
 }
+
 @media (max-width: 1280px){
   .product-grid{ grid-template-columns: repeat(3, minmax(240px, 1fr)); }
 }
@@ -662,3 +663,4 @@ a{ color:inherit; text-decoration:none; }
 @media (max-width: 600px){
   .product-grid{ grid-template-columns: repeat(1, minmax(240px, 1fr)); }
 }
+

@@ -27,7 +27,10 @@ class CartItem(models.Model):
         related_name="cart_items",
     )
     quantity = models.PositiveIntegerField()
-    unit_price = models.PositiveIntegerField()
+    unit_price = models.DecimalField(
+    max_digits=10,
+    decimal_places=2
+)
 
     class Meta:
         constraints = [
