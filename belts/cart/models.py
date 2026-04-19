@@ -1,18 +1,26 @@
 from django.conf import settings
 from django.db import models
 
+from belts.product.models import Product
+
 
 class Cart(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="cart",
+        verbose_name="Пользователь",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
+
+    class Meta:
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзины"
+        ordering = ["-updated_at"]
 
     def __str__(self):
-        return f"Cart #{self.pk} for {self.user}"
+        return f"Корзина пользователя {self.user}"
 
 
 class CartItem(models.Model):
@@ -20,25 +28,21 @@ class CartItem(models.Model):
         Cart,
         on_delete=models.CASCADE,
         related_name="items",
+        verbose_name="Корзина",
     )
     product = models.ForeignKey(
-        "product.Product",
-        on_delete=models.PROTECT,
+        Product,
+        on_delete=models.CASCADE,
         related_name="cart_items",
+        verbose_name="Товар",
     )
-    quantity = models.PositiveIntegerField()
-    unit_price = models.DecimalField(
-    max_digits=10,
-    decimal_places=2
-)
+    quantity = models.PositiveIntegerField("Количество", default=1)
+    unit_price = models.DecimalField("Цена за единицу", max_digits=10, decimal_places=2)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["cart", "product"],
-                name="unique_cart_item_per_product",
-            )
-        ]
+        verbose_name = "Товар в корзине"
+        verbose_name_plural = "Товары в корзине"
+        ordering = ["id"]
 
     def __str__(self):
-        return f"{self.product} x{self.quantity}"
+        return f"{self.product.name} ({self.quantity} шт.)"

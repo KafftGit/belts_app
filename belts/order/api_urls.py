@@ -1,8 +1,19 @@
 from django.urls import path
-from belts.order.api_views import OrderListApiView, OrderDetailApiView, OrderCreateApiView
+
+from belts.cart.api_views import (
+    CartCompleteApiView,
+    CartDetailApiView,
+    CartItemChangeApiView,
+    CartItemCreateApiView,
+    CartItemDeleteApiView,
+    CartItemUpdateApiView,
+)
 
 urlpatterns = [
-    path('', OrderListApiView.as_view(), name='api-order-list'),
-    path('create/', OrderCreateApiView.as_view(), name='api-order-create'),
-    path('<int:pk>/', OrderDetailApiView.as_view(), name='api-order-detail'),
+    path("", CartDetailApiView.as_view(), name="api-cart-detail"),
+    path("items/", CartItemCreateApiView.as_view(), name="api-cart-create"),
+    path("items/update/", CartItemUpdateApiView.as_view(), name="api-cart-update"),
+    path("items/change/", CartItemChangeApiView.as_view(), name="api-cart-change"),
+    path("items/delete/", CartItemDeleteApiView.as_view(), name="api-cart-delete"),
+    path("complete/", CartCompleteApiView.as_view(), name="api-cart-complete"),
 ]

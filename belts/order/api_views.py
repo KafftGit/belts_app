@@ -24,7 +24,9 @@ class OrderListApiView(APIView):
                             "id": 1,
                             "status": "NEW",
                             "total_price": "13900.00",
-                            "address": "Санкт-Петербург, Невский проспект, 10",
+                            "address": "Москва, ул. Пушкина, д. 10, кв. 5",
+                            "recipient_name": "Иван Иванов",
+                            "phone": "+7 (999) 123-45-67",
                             "created_at": "2026-04-03T20:00:00"
                         }
                     ]
@@ -50,6 +52,8 @@ class OrderListApiView(APIView):
                 "status": order.status,
                 "total_price": str(order.total_price),
                 "address": order.address,
+                "recipient_name": order.recipient_name,
+                "phone": order.phone,
                 "created_at": order.created_at.isoformat() if order.created_at else None,
             })
 
@@ -71,7 +75,17 @@ class OrderDetailApiView(APIView):
                         "id": 1,
                         "status": "NEW",
                         "total_price": "13900.00",
-                        "address": "Санкт-Петербург, Невский проспект, 10",
+                        "recipient_name": "Иван Иванов",
+                        "phone": "+7 (999) 123-45-67",
+                        "city": "Москва",
+                        "street": "Пушкина",
+                        "house": "10",
+                        "apartment": "5",
+                        "entrance": "2",
+                        "floor": "3",
+                        "intercom": "45",
+                        "postal_code": "101000",
+                        "address": "Москва, ул. Пушкина, д. 10, кв. 5",
                         "extra_notes": "Позвонить перед доставкой",
                         "created_at": "2026-04-03T20:00:00",
                         "items": [
@@ -114,6 +128,16 @@ class OrderDetailApiView(APIView):
             "id": order.id,
             "status": order.status,
             "total_price": str(order.total_price),
+            "recipient_name": order.recipient_name,
+            "phone": order.phone,
+            "city": order.city,
+            "street": order.street,
+            "house": order.house,
+            "apartment": order.apartment,
+            "entrance": order.entrance,
+            "floor": order.floor,
+            "intercom": order.intercom,
+            "postal_code": order.postal_code,
             "address": order.address,
             "extra_notes": order.extra_notes,
             "created_at": order.created_at.isoformat() if order.created_at else None,
@@ -130,82 +154,3 @@ class OrderDetailApiView(APIView):
             })
 
         return Response(data, status=status.HTTP_200_OK)
-
-
-class OrderCreateApiView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    @swagger_auto_schema(
-        operation_summary="Создание заказа",
-        operation_description="Создаёт новый заказ на основе введённых данных.",
-        tags=["Orders"],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=["address"],
-            properties={
-                "address": openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description="Адрес доставки",
-                    example="Санкт-Петербург, Невский проспект, 10"
-                ),
-                "extra_notes": openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description="Дополнительные комментарии к заказу",
-                    example="Позвонить перед доставкой"
-                ),
-            },
-        ),
-        responses={
-            201: openapi.Response(
-                description="Заказ успешно создан",
-                examples={
-                    "application/json": {
-                        "id": 15,
-                        "status": "NEW",
-                        "message": "Заказ успешно создан"
-                    }
-                },
-            ),
-            400: openapi.Response(
-                description="Некорректные данные",
-                examples={
-                    "application/json": {
-                        "detail": "Поле address обязательно"
-                    }
-                },
-            ),
-            401: openapi.Response(
-                description="Требуется авторизация",
-                examples={
-                    "application/json": {
-                        "detail": "Требуется авторизация"
-                    }
-                },
-            ),
-        },
-    )
-    def post(self, request):
-        address = request.data.get("address")
-        extra_notes = request.data.get("extra_notes", "")
-
-        if not address:
-            return Response(
-                {"detail": "Поле address обязательно"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        order = Order.objects.create(
-            user=request.user,
-            address=address,
-            extra_notes=extra_notes,
-            total_price=0,
-        )
-
-        return Response(
-            {
-                "id": order.id,
-                "status": order.status,
-                "message": "Заказ успешно создан"
-            },
-            status=status.HTTP_201_CREATED
-        )

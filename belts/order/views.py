@@ -1,12 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from belts.order.models import Order, Status
-from belts.order.manager import OrderViewManager
 from belts.mixins import IsUserOwnerOfModelMixin
+from belts.order.manager import OrderViewManager
+from belts.order.models import Order
 
 
 class OrderDetailView(IsUserOwnerOfModelMixin, DetailView):
@@ -31,8 +29,8 @@ class OrderCancelView(IsUserOwnerOfModelMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        self.object.status = Status.CANCELED
-        self.object.save()
+        self.object.status = "CANCELLED"
+        self.object.save(update_fields=["status"])
 
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)

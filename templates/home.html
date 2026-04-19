@@ -52,17 +52,61 @@
                 </div>
               {% endfor %}
             </div>
+            
             {% if is_paginated %}
-              <div class="pagination">
+              <nav class="pagination pagination--premium" aria-label="Пагинация товаров">
+
                 {% if page_obj.has_previous %}
-                  <a class="pagination__link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+                  <a class="pagination__link pagination__link--icon" href="?page=1" aria-label="Первая страница">
+                    ⏮
+                  </a>
+                  <a class="pagination__link pagination__link--icon" href="?page={{ page_obj.previous_page_number }}" aria-label="Предыдущая страница">
+                    ‹
+                  </a>
+                {% else %}
+                  <span class="pagination__link pagination__link--icon pagination__link--disabled">⏮</span>
+                  <span class="pagination__link pagination__link--icon pagination__link--disabled">‹</span>
                 {% endif %}
-                <span class="pagination__info">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+                <div class="pagination__pages">
+                  {% for num in page_obj.paginator.page_range %}
+                    {% if num == page_obj.number %}
+                      <span class="pagination__link pagination__link--page pagination__link--active">
+                        {{ num }}
+                      </span>
+                    {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+                      <a class="pagination__link pagination__link--page" href="?page={{ num }}">
+                        {{ num }}
+                      </a>
+                    {% elif num == 1 or num == page_obj.paginator.num_pages %}
+                      <a class="pagination__link pagination__link--page" href="?page={{ num }}">
+                        {{ num }}
+                      </a>
+                    {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+                      <span class="pagination__dots">…</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+
                 {% if page_obj.has_next %}
-                  <a class="pagination__link" href="?page={{ page_obj.next_page_number }}">Вперёд</a>
+                  <a class="pagination__link pagination__link--icon" href="?page={{ page_obj.next_page_number }}" aria-label="Следующая страница">
+                    ›
+                  </a>
+                  <a class="pagination__link pagination__link--icon" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Последняя страница">
+                    ⏭
+                  </a>
+                {% else %}
+                  <span class="pagination__link pagination__link--icon pagination__link--disabled">›</span>
+                  <span class="pagination__link pagination__link--icon pagination__link--disabled">⏭</span>
                 {% endif %}
+
+              </nav>
+
+              <div class="pagination__meta">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
               </div>
             {% endif %}
+            
           {% else %}
             <p class="sub">Пока нет товаров.</p>
           {% endif %}

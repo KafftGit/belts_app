@@ -1,29 +1,49 @@
 {% load static %}
 <header class="header">
-    <div class="container header__inner">
-        <a class="brand" href="{% url 'home-page' %}" aria-label="На главную">
-            <img src="{% static 'Logo.png' %}" alt="FABIS CRAFT logo" class="brand__icon" />
-            <span>FABIS CRAFT</span>
-        </a>
+  <div class="container header__inner">
 
-        <nav class="nav-actions" aria-label="Аккаунт">
-            {% if request.user.is_authenticated %}
-                <span class="kicker" style="letter-spacing:.08em;">{{ request.user.username }}</span>
-                <a class="btn" href="{% url 'order-list' %}">Мои заказы</a>
-                <form class="nav-form" method="post" action="{% url 'user-logout' %}">
-                    {% csrf_token %}
-                    <button class="btn" type="submit">Выйти</button>
-                </form>
-                <a class="btn btn--ghost cart-link" href="{% url 'cart' %}" aria-label="Корзина">
-                    <span class="cart-emoji" aria-hidden="true">📦</span>
-                    <span class="cart-count">{{ cart_items_count }}</span>
-                </a>
-            {% else %}
-                <a class="btn" href="{% url 'user-login' %}">Вход</a>
-                <a class="btn" href="{% url 'user-register' %}">Регистрация</a>
-            {% endif %}
-        </nav>
+    <div class="header__left">
+      <a class="brand" href="{% url 'home-page' %}" aria-label="На главную">
+        <img src="{% static 'Logo.png' %}" alt="FABIS CRAFT logo" class="brand__icon" />
+        <span class="brand__text">FABIS CRAFT</span>
+      </a>
     </div>
+
+    <div class="header__right">
+      <a href="tel:+79684350525" class="header-phone" aria-label="Позвонить">
+        <span class="header-phone__icon" aria-hidden="true">📞</span>
+        <span class="header-phone__number">8-968-435-05-25</span>
+      </a>
+
+      <nav class="nav-actions" aria-label="Аккаунт">
+        {% if request.user.is_authenticated %}
+          <span class="kicker" style="letter-spacing:.08em;">{{ request.user.username }}</span>
+
+          <a class="btn" href="{% url 'order-list' %}">Мои заказы</a>
+
+          <form class="nav-form" method="post" action="{% url 'user-logout' %}">
+            {% csrf_token %}
+            <button class="btn" type="submit">Выйти</button>
+          </form>
+
+          <a class="btn btn--ghost cart-link" href="{% url 'cart' %}" aria-label="Корзина">
+            <span class="cart-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="cart-icon__svg" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.5 9.5V8a4.5 4.5 0 1 1 9 0v1.5" />
+                <path d="M6 9.5h12l-1 10.5a1.5 1.5 0 0 1-1.49 1.36H8.49A1.5 1.5 0 0 1 7 20L6 9.5Z" />
+                <path d="M9.5 12.5v1.5" />
+                <path d="M14.5 12.5v1.5" />
+              </svg>
+            </span>
+            <span class="cart-count">{{ cart_items_count }}</span>
+          </a>
+
+        {% else %}
+          <a class="btn" href="{% url 'user-login' %}">Вход</a>
+          <a class="btn" href="{% url 'user-register' %}">Регистрация</a>
+        {% endif %}
+      </nav>
+    </div>
+
+  </div>
 </header>
-
-

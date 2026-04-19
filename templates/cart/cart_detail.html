@@ -1,140 +1,461 @@
- {% load static %}
+{% load static %}
 <!doctype html>
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FABIS CRAFT — Корзина</title>
+  <title>Корзина — FABIS CRAFT</title>
   <link rel="stylesheet" href="{% static 'styles.css' %}" />
 </head>
 <body>
   {% include "includes/header.html" %}
 
-  <main class="main main--home">
+  <main class="main">
     <div class="container">
-      <section class="products">
-        <h2 class="section-title section-title--center">Моя корзина</h2>
+      <h1 class="section-title section-title--center">Корзина</h1>
 
-        <div class="card" style="margin-bottom:24px;">
-          <div style="display:flex; flex-wrap:wrap; gap:18px; align-items:center; justify-content:space-between; margin-bottom:14px;">
-            <div>
-              <div style="font-weight:700; font-size:18px;">Текущие товары</div>
-            </div>
-            <div style="text-align:right;"></div>
-          </div>
+      {% if cart_items %}
+        <div id="cart-items" class="product-grid">
+          {% for item in cart_items %}
+            <div class="product-card product-card--list cart-card" data-product-id="{{ item.product.id }}">
+              {% if item.product.main_image %}
+                <a class="product-image" href="{% url 'product-detail' item.product.slug %}">
+                  <img src="{{ item.product.main_image.image.url }}" alt="{{ item.product.name }}">
+                </a>
+              {% endif %}
 
-          {% if object.items.all %}
-            <div class="product-grid" style="grid-template-columns: repeat(3, minmax(240px, 1fr));">
-              {% for item in object.items.all %}
-                <div class="product-card product-card--list">
-                  <div class="product-image-wrap">
-                    <a class="product-image" href="{% url 'product-detail' item.product.slug %}">
-                      {% if item.product.main_image %}
-                        <img src="{{ item.product.main_image.image.url }}" alt="{{ item.product.name }}" style="height:140px;">
-                      {% else %}
-                        <img src="{% static 'logo.jpg' %}" alt="{{ item.product.name }}" style="height:140px;">
-                      {% endif %}
-                    </a>
-                    <form action="{% url 'cart-item-delete' %}" class="cart-item-remove" data-cart-item-delete>
-                      {% csrf_token %}
-                      <input type="hidden" name="product" value="{{ item.product.id }}">
-                      <input type="hidden" name="next" value="{% url 'cart' %}">
-                      <button type="button" class="cart-item-remove__btn" aria-label="Удалить из корзины" data-cart-item-delete-btn>&times;</button>
-                    </form>
-                  </div>
-                  <div class="product-info">
-                    <a class="product-title" href="{% url 'product-detail' item.product.slug %}">{{ item.product.name }}</a>
-                    <div class="sub" style="margin:0;">Кол-во: {{ item.quantity }}</div>
-                    <div class="price">
-                      Итого: {% widthratio item.unit_price 1 item.quantity %} ₽
-                    </div>
-                  </div>
+              <div class="product-info product-info--cart">
+                <a class="product-title product-title--cart" href="{% url 'product-detail' item.product.slug %}">
+                  {{ item.product.name }}
+                </a>
+
+                <p class="price price--cart">
+                  <span class="unit-price">{{ item.unit_price }}</span> ₽ за шт.
+                </p>
+
+                <div class="cart-qty-row">
+                  <button
+                    class="qty-btn qty-btn--minus"
+                    type="button"
+                    data-action="decrease"
+                    aria-label="Уменьшить количество"
+                  >
+                    −
+                  </button>
+
+                  <input
+                    class="cart-form__qty cart-qty-input"
+                    type="number"
+                    min="1"
+                    value="{{ item.quantity }}"
+                    data-product-id="{{ item.product.id }}"
+                    aria-label="Количество товара"
+                    readonly
+                  >
+
+                  <button
+                    class="qty-btn qty-btn--plus"
+                    type="button"
+                    data-action="increase"
+                    aria-label="Увеличить количество"
+                    {% if item.product.stock and item.quantity >= item.product.stock %}disabled{% endif %}
+                  >
+                    +
+                  </button>
                 </div>
-              {% endfor %}
+
+                <p class="sub sub--cart-line">
+                  Количество: <strong class="item-quantity">{{ item.quantity }}</strong>
+                </p>
+
+                <p class="sub sub--cart-line">
+                  Сумма:
+                  <strong class="item-total-price">
+                    {% if item.item_total_price %}
+                      {{ item.item_total_price }}
+                    {% else %}
+                      {{ item.unit_price }}
+                    {% endif %}
+                  </strong> ₽
+                </p>
+
+                <div class="cart-item-actions">
+                  <button
+                    class="btn btn--ghost delete-item-btn"
+                    type="button"
+                    data-product-id="{{ item.product.id }}"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              </div>
             </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:28px;">
-              <div class="product-title" style="margin:0;">Стоимость товаров:</div>
-              <div style="font-weight:700;">{{ cart_total_price }} ₽</div>
-            </div>
-            <form method="post" action="{% url 'cart-complete' %}" class="cart-order-form" style="margin-top:18px;">
-              {% csrf_token %}
-              <input type="hidden" name="next" value="{% url 'cart' %}">
-              <div class="form__row">
-                <label class="label" for="order-address">Адрес доставки</label>
-                <input class="input" id="order-address" name="address" type="text" required>
-              </div>
-              <div class="form__row order-field--spaced">
-                <label class="label" for="order-notes">Комментарий</label>
-                <input class="input" id="order-notes" name="extra_notes" type="text">
-              </div>
-              <div class="order-actions">
-                <button class="btn btn--primary" type="submit">Оформить заказ</button>
-              </div>
-            </form>
-          {% else %}
-            <p class="sub">В корзине нет товаров.</p>
-          {% endif %}
+          {% endfor %}
         </div>
-      </section>
+
+        <div id="cart-summary" class="card cart-summary-card">
+          <h2 class="card__title">Итого</h2>
+
+          <p class="price cart-summary-total">
+            <span id="cart-total-price">{{ cart_total_price }}</span> ₽
+          </p>
+
+          <form
+            id="complete-order-form"
+            method="post"
+            action="{% url 'cart-complete' %}"
+            class="form form--checkout"
+            style="margin-top: 16px;"
+          >
+            {% csrf_token %}
+
+            <div class="checkout-grid checkout-grid--2-equal">
+              <div class="form__row">
+                <label class="label" for="recipient_name">Получатель</label>
+                <input id="recipient_name" class="input input--compact" type="text" name="recipient_name" required>
+              </div>
+
+              <div class="form__row">
+                <label class="label" for="phone">Телефон</label>
+                <input id="phone" class="input input--compact" type="text" name="phone" placeholder="+7 (999) 123-45-67" required>
+              </div>
+            </div>
+
+            <div class="checkout-grid checkout-grid--2-equal">
+              <div class="form__row">
+                <label class="label" for="city">Город</label>
+                <input id="city" class="input input--compact" type="text" name="city" required>
+              </div>
+
+              <div class="form__row">
+                <label class="label" for="street">Улица</label>
+                <input id="street" class="input input--compact" type="text" name="street" required>
+              </div>
+            </div>
+
+            <div class="checkout-grid checkout-grid--address-small">
+              <div class="form__row">
+                <label class="label" for="house">Дом</label>
+                <input id="house" class="input input--compact" type="text" name="house" required>
+              </div>
+
+              <div class="form__row">
+                <label class="label" for="apartment">Квартира</label>
+                <input id="apartment" class="input input--compact" type="text" name="apartment">
+              </div>
+
+              <div class="form__row">
+                <label class="label" for="postal_code">Индекс</label>
+                <input id="postal_code" class="input input--compact" type="text" name="postal_code">
+              </div>
+
+              <div class="form__row">
+                <label class="label" for="entrance">Подъезд</label>
+                <input id="entrance" class="input input--compact" type="text" name="entrance">
+              </div>
+
+              <div class="form__row">
+                <label class="label" for="floor">Этаж</label>
+                <input id="floor" class="input input--compact" type="text" name="floor">
+              </div>
+
+              <div class="form__row">
+                <label class="label" for="intercom">Домофон</label>
+                <input id="intercom" class="input input--compact" type="text" name="intercom">
+              </div>
+            </div>
+
+            <div class="form__row">
+              <label class="label" for="extra_notes">Комментарий</label>
+              <input id="extra_notes" class="input input--compact" type="text" name="extra_notes">
+            </div>
+
+            <button class="btn btn--primary full" type="submit">
+              Оформить заказ
+            </button>
+          </form>
+        </div>
+      {% else %}
+        <div class="hero hero--center">
+          <h2 class="h1">Корзина пуста</h2>
+          <div class="divider"></div>
+          <a class="btn btn--primary" href="{% url 'home-page' %}">
+            Перейти к товарам
+          </a>
+        </div>
+      {% endif %}
     </div>
   </main>
+
+  <div id="order-success-modal" class="modal" aria-hidden="true">
+    <div class="modal__backdrop"></div>
+
+    <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="order-success-title">
+      <button type="button" class="modal__close" id="order-success-close" aria-label="Закрыть">
+        ×
+      </button>
+
+      <div class="modal__content">
+        <div class="modal__icon">✓</div>
+        <h2 id="order-success-title" class="modal__title">Заказ оформлен</h2>
+        <p class="modal__text">
+          Спасибо за заказ. Мы получили вашу заявку и скоро свяжемся с вами.
+        </p>
+
+        <div class="modal__actions">
+          <button type="button" class="btn btn--primary" id="order-success-home">
+            На главную
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    (function () {
-      const forms = document.querySelectorAll("[data-cart-item-delete]");
-      if (!forms.length) return;
-
-      const getCookie = (name) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(";").shift();
-        return null;
-      };
-
-      const csrfToken = getCookie("csrftoken");
-
-      forms.forEach((form) => {
-        const button = form.querySelector("[data-cart-item-delete-btn]");
-        if (!button) return;
-
-        button.addEventListener("click", async () => {
-          const formData = new FormData(form);
-          try {
-            await fetch(form.action, {
-              method: "DELETE",
-              headers: {
-                "X-CSRFToken": csrfToken || "",
-              },
-              body: new URLSearchParams(formData),
-            });
-          } finally {
-            window.location.reload();
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+          cookie = cookie.trim();
+          if (cookie.substring(0, name.length + 1) === (name + "=")) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
           }
-        });
+        }
+      }
+      return cookieValue;
+    }
+
+    const csrftoken = getCookie("csrftoken");
+
+    const orderSuccessModal = document.getElementById("order-success-modal");
+    const orderSuccessHomeBtn = document.getElementById("order-success-home");
+    const orderSuccessCloseBtn = document.getElementById("order-success-close");
+
+    function openOrderSuccessModal() {
+      if (!orderSuccessModal) return;
+      orderSuccessModal.classList.add("modal--open");
+      orderSuccessModal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+    }
+
+    function closeOrderSuccessModal() {
+      if (!orderSuccessModal) return;
+      orderSuccessModal.classList.remove("modal--open");
+      orderSuccessModal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+    }
+
+    function updateCartSummary(totalPrice) {
+      const totalEl = document.getElementById("cart-total-price");
+      if (totalEl) {
+        totalEl.textContent = totalPrice;
+      }
+    }
+
+    function animateCard(card) {
+      card.classList.remove("cart-card--pulse");
+      void card.offsetWidth;
+      card.classList.add("cart-card--pulse");
+    }
+
+    function updateCardData(card, data) {
+      const qtyInput = card.querySelector(".cart-qty-input");
+      const qtyText = card.querySelector(".item-quantity");
+      const itemTotal = card.querySelector(".item-total-price");
+      const plusBtn = card.querySelector(".qty-btn--plus");
+
+      if (qtyInput && data.item_quantity !== undefined && data.item_quantity !== null) {
+        qtyInput.value = data.item_quantity;
+      }
+
+      if (qtyText && data.item_quantity !== undefined && data.item_quantity !== null) {
+        qtyText.textContent = data.item_quantity;
+      }
+
+      if (itemTotal && data.item_total_price !== undefined && data.item_total_price !== null) {
+        itemTotal.textContent = data.item_total_price;
+      }
+
+      if (plusBtn) {
+        if (data.stock !== undefined && data.stock !== null && data.item_quantity !== undefined && data.item_quantity !== null) {
+          plusBtn.disabled = Number(data.item_quantity) >= Number(data.stock);
+        } else {
+          plusBtn.disabled = false;
+        }
+      }
+
+      animateCard(card);
+    }
+
+    function removeCartCard(productId) {
+      const card = document.querySelector(`.cart-card[data-product-id="${productId}"]`);
+      if (!card) return;
+
+      card.classList.add("cart-card--removing");
+
+      setTimeout(() => {
+        card.remove();
+
+        const remainingCards = document.querySelectorAll(".cart-card");
+        if (remainingCards.length === 0) {
+          const cartItems = document.getElementById("cart-items");
+          const cartSummary = document.getElementById("cart-summary");
+
+          if (cartItems) cartItems.remove();
+          if (cartSummary) cartSummary.remove();
+
+          const container = document.querySelector(".main .container");
+          if (container) {
+            container.insertAdjacentHTML(
+              "beforeend",
+              `
+              <div class="hero hero--center">
+                <h2 class="h1">Корзина пуста</h2>
+                <div class="divider"></div>
+                <a class="btn btn--primary" href="{% url 'home-page' %}">
+                  Перейти к товарам
+                </a>
+              </div>
+              `
+            );
+          }
+        }
+      }, 220);
+    }
+
+    async function postForm(url, payload) {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrftoken,
+          "X-Requested-With": "XMLHttpRequest",
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          "Accept": "application/json",
+        },
+        body: new URLSearchParams(payload),
       });
-    })();
-  </script>
-  <script>
-    (function () {
-      const orderForm = document.querySelector(".cart-order-form");
-      if (!orderForm) return;
 
-      orderForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+      const data = await response.json();
 
-        const formData = new FormData(orderForm);
+      if (!response.ok) {
+        throw data;
+      }
+
+      return data;
+    }
+
+    document.addEventListener("click", async function (event) {
+      const qtyBtn = event.target.closest(".qty-btn");
+      const deleteBtn = event.target.closest(".delete-item-btn");
+
+      if (qtyBtn) {
+        const card = qtyBtn.closest(".cart-card");
+        const productId = card.dataset.productId;
+        const action = qtyBtn.dataset.action;
 
         try {
-          await fetch(orderForm.action, {
-            method: "POST",
-            body: new URLSearchParams(formData),
+          const data = await postForm("{% url 'cart-item-change' %}", {
+            product: productId,
+            action: action,
           });
-        } finally {
-          window.location.href = "{% url 'home-page' %}";
+
+          if (data.removed) {
+            removeCartCard(productId);
+          } else {
+            updateCardData(card, data);
+          }
+
+          updateCartSummary(data.cart_total_price);
+        } catch (error) {
+          const plusBtn = card.querySelector(".qty-btn--plus");
+
+          if (action === "increase") {
+            if (plusBtn) {
+              plusBtn.disabled = true;
+            }
+            return;
+          }
+
+          return;
         }
+      }
+
+      if (deleteBtn) {
+        const productId = deleteBtn.dataset.productId;
+
+        try {
+          const data = await postForm("{% url 'cart-item-delete' %}", {
+            product: productId,
+          });
+
+          if (data.removed) {
+            removeCartCard(productId);
+          }
+
+          updateCartSummary(data.cart_total_price);
+        } catch (error) {
+          return;
+        }
+      }
+
+      if (event.target.classList.contains("modal__backdrop")) {
+        closeOrderSuccessModal();
+      }
+    });
+
+    document.addEventListener("submit", async function (event) {
+      const completeForm = event.target.closest("#complete-order-form");
+
+      if (!completeForm) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const formData = new FormData(completeForm);
+
+      try {
+        const response = await fetch(completeForm.action, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrftoken,
+            "X-Requested-With": "XMLHttpRequest",
+            "Accept": "application/json",
+          },
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          return;
+        }
+
+        openOrderSuccessModal();
+      } catch (error) {
+        return;
+      }
+    });
+
+    if (orderSuccessHomeBtn) {
+      orderSuccessHomeBtn.addEventListener("click", function () {
+        window.location.href = "{% url 'home-page' %}";
       });
-    })();
+    }
+
+    if (orderSuccessCloseBtn) {
+      orderSuccessCloseBtn.addEventListener("click", function () {
+        closeOrderSuccessModal();
+      });
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && orderSuccessModal?.classList.contains("modal--open")) {
+        closeOrderSuccessModal();
+      }
+    });
   </script>
 </body>
 </html>
-
-

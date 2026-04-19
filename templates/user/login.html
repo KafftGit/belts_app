@@ -17,8 +17,11 @@
 
                 <form class="form" action="{% url 'user-login' %}" method="post">
                     {% csrf_token %}
+
                     <div class="form__row">
-                        <label class="label" for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        <label class="label" for="{{ form.username.id_for_label }}">
+                            {{ form.username.label }}
+                        </label>
                         {{ form.username }}
                         {% for field_error in form.username.errors %}
                             <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
@@ -26,11 +29,19 @@
                     </div>
 
                     <div class="form__row">
-                        <label class="label" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        <label class="label" for="{{ form.password.id_for_label }}">
+                            {{ form.password.label }}
+                        </label>
                         {{ form.password }}
                         {% for field_error in form.password.errors %}
                             <p style="color:#ffb4a6; margin:6px 0 0;">{{ field_error }}</p>
                         {% endfor %}
+                    </div>
+
+                    <div class="helper" style="justify-content: space-between; align-items: center;">
+                        <button type="button" class="link-btn" id="forgot-password-btn">
+                            Забыли пароль?
+                        </button>
                     </div>
 
                     {% for non_field_error in form.non_field_errors %}
@@ -46,5 +57,147 @@
             </section>
         </div>
     </main>
+
+    <div id="forgot-modal" class="modal" aria-hidden="true">
+        <div class="modal__backdrop"></div>
+
+        <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="forgot-title">
+            <button type="button" class="modal__close" id="forgot-close" aria-label="Закрыть">
+                ×
+            </button>
+
+            <div class="modal__content">
+                <h2 id="forgot-title" class="modal__title">Восстановление пароля</h2>
+
+                <p class="modal__text">
+                    Введите вашу почту, и мы отправим временный пароль.
+                </p>
+
+                <div class="form__row" style="margin-bottom: 18px;">
+                    <input
+                        type="email"
+                        id="forgot-email"
+                        class="input input--compact"
+                        placeholder="example@mail.com"
+                    >
+                </div>
+
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--primary" id="forgot-submit">
+                        Отправить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="forgot-success-modal" class="modal" aria-hidden="true">
+        <div class="modal__backdrop"></div>
+
+        <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="forgot-success-title">
+            <button type="button" class="modal__close" id="forgot-success-close" aria-label="Закрыть">
+                ×
+            </button>
+
+            <div class="modal__content">
+                <div class="modal__icon">✓</div>
+                <h2 id="forgot-success-title" class="modal__title">Письмо отправлено</h2>
+
+                <p class="modal__text">
+                    Письмо для восстановления пароля отправлено на указанную почту.
+                </p>
+
+                <div class="modal__actions">
+                    <button type="button" class="btn btn--primary" id="forgot-success-ok">
+                        Понятно
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const forgotModal = document.getElementById("forgot-modal");
+        const forgotBtn = document.getElementById("forgot-password-btn");
+        const forgotClose = document.getElementById("forgot-close");
+        const forgotSubmit = document.getElementById("forgot-submit");
+        const forgotEmail = document.getElementById("forgot-email");
+
+        const forgotSuccessModal = document.getElementById("forgot-success-modal");
+        const forgotSuccessClose = document.getElementById("forgot-success-close");
+        const forgotSuccessOk = document.getElementById("forgot-success-ok");
+
+        function openForgotModal() {
+            if (!forgotModal) return;
+            forgotModal.classList.add("modal--open");
+            forgotModal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("modal-open");
+        }
+
+        function closeForgotModal() {
+            if (!forgotModal) return;
+            forgotModal.classList.remove("modal--open");
+            forgotModal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("modal-open");
+        }
+
+        function openForgotSuccessModal() {
+            if (!forgotSuccessModal) return;
+            forgotSuccessModal.classList.add("modal--open");
+            forgotSuccessModal.setAttribute("aria-hidden", "false");
+            document.body.classList.add("modal-open");
+        }
+
+        function closeForgotSuccessModal() {
+            if (!forgotSuccessModal) return;
+            forgotSuccessModal.classList.remove("modal--open");
+            forgotSuccessModal.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("modal-open");
+        }
+
+        forgotBtn?.addEventListener("click", openForgotModal);
+        forgotClose?.addEventListener("click", closeForgotModal);
+
+        forgotSuccessClose?.addEventListener("click", closeForgotSuccessModal);
+        forgotSuccessOk?.addEventListener("click", closeForgotSuccessModal);
+
+        document.addEventListener("click", function (event) {
+            if (event.target.classList.contains("modal__backdrop")) {
+                if (forgotModal?.classList.contains("modal--open")) {
+                    closeForgotModal();
+                }
+                if (forgotSuccessModal?.classList.contains("modal--open")) {
+                    closeForgotSuccessModal();
+                }
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                if (forgotModal?.classList.contains("modal--open")) {
+                    closeForgotModal();
+                }
+                if (forgotSuccessModal?.classList.contains("modal--open")) {
+                    closeForgotSuccessModal();
+                }
+            }
+        });
+
+        forgotSubmit?.addEventListener("click", async function () {
+            const email = forgotEmail.value.trim();
+
+            if (!email) {
+                return;
+            }
+
+            try {
+                forgotEmail.value = "";
+                closeForgotModal();
+                openForgotSuccessModal();
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    </script>
 </body>
 </html>
