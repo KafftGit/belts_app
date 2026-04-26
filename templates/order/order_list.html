@@ -22,23 +22,7 @@
                 <div>
                   <div style="font-weight:700; font-size:18px;">
                     <span style="font-weight:400;">Статус заказа:</span>
-                    {% with status=order.status %}
-              {% if status == "NEW" %}
-                Новый
-              {% elif status == "APPROVED" %}
-                Подтвержден
-              {% elif status == "DECLINED" %}
-                Отказано
-              {% elif status == "CANCELED" %}
-                Отменен
-              {% elif status == "DONE" %}
-                Выполнен
-              {% elif status == "PROCESSING" %}
-                В процессе
-              {% else %}
-                {{ status }}
-              {% endif %}
-            {% endwith %}
+                    {{ order.get_status_display }}
                   </div>
                 </div>
                 <div style="text-align:right;">

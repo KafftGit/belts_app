@@ -71,11 +71,7 @@
                 <p class="sub sub--cart-line">
                   Сумма:
                   <strong class="item-total-price">
-                    {% if item.item_total_price %}
-                      {{ item.item_total_price }}
-                    {% else %}
-                      {{ item.unit_price }}
-                    {% endif %}
+                    {{ item.item_total_price }}
                   </strong> ₽
                 </p>
 
@@ -254,6 +250,13 @@
       }
     }
 
+    function updateHeaderCartCount(count) {
+      const cartCountEl = document.querySelector(".cart-count");
+      if (cartCountEl && count !== undefined && count !== null) {
+        cartCountEl.textContent = count;
+      }
+    }
+
     function animateCard(card) {
       card.classList.remove("cart-card--pulse");
       void card.offsetWidth;
@@ -368,6 +371,7 @@
           }
 
           updateCartSummary(data.cart_total_price);
+          updateHeaderCartCount(data.cart_items_count);
         } catch (error) {
           const plusBtn = card.querySelector(".qty-btn--plus");
 
@@ -395,6 +399,7 @@
           }
 
           updateCartSummary(data.cart_total_price);
+          updateHeaderCartCount(data.cart_items_count);
         } catch (error) {
           return;
         }
@@ -433,6 +438,7 @@
           return;
         }
 
+        updateHeaderCartCount(0);
         openOrderSuccessModal();
       } catch (error) {
         return;

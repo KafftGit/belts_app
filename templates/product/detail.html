@@ -3,7 +3,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ object.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ object.name }} — FABIS CRAFT</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
@@ -11,7 +12,6 @@
 {% include "includes/header.html" %}
 
 <main class="container">
-
     <div class="product-card product-card--detail product-detail">
 
         <div class="product-image carousel" data-carousel>
@@ -31,6 +31,7 @@
             {% if object.category %}
                 <div class="category">{{ object.category.name|capfirst }}</div>
             {% endif %}
+
             <h1 class="product-title">{{ object.name }}</h1>
 
             <div class="price">{{ object.price }} ₽</div>
@@ -39,36 +40,228 @@
                 {{ object.description }}
             </p>
 
+            <div class="sub" style="margin: 6px 0 0;">
+                {% if object.stock > 0 %}
+                    В наличии:
+                    <strong id="product-stock-value">{{ object.stock }}</strong> шт.
+                {% else %}
+                    <strong style="color:#ffb4a6;">Нет в наличии</strong>
+                {% endif %}
+            </div>
+
             <div class="product-actions">
-                <form class="cart-form" method="post" action="{% url 'cart-create' %}">
+                <form id="add-to-cart-form" class="cart-form" method="post" action="{% url 'cart-create' %}">
                     {% csrf_token %}
                     <input type="hidden" name="product" value="{{ object.id }}">
                     <input type="hidden" name="unit_price" value="{{ object.price }}">
-                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
                     <div class="cart-form__row">
                         <input
+                            id="product-qty-input"
                             class="cart-form__qty"
                             type="number"
                             name="quantity"
-                            value="1"
+                            value="{% if object.stock > 0 %}1{% else %}0{% endif %}"
                             min="1"
-                            {% if object.stock_quantity and object.stock_quantity > 1 %}max="{{ object.stock_quantity }}"{% endif %}
+                            max="{{ object.stock }}"
                             step="1"
                             aria-label="Количество"
+                            {% if object.stock == 0 %}disabled{% endif %}
                         >
-                        <button class="buy-btn" type="submit">Добавить в корзину</button>
+
+                        <button
+                            id="add-to-cart-btn"
+                            class="buy-btn"
+                            type="submit"
+                            {% if object.stock == 0 %}disabled{% endif %}
+                        >
+                            Добавить в корзину
+                        </button>
                     </div>
                 </form>
+
+                <p id="product-cart-hint" class="sub" style="display:none; margin-top:12px;"></p>
             </div>
         </div>
 
     </div>
-
 </main>
 
-</body>
-</html>
+<!-- Мини-уведомление -->
+<div id="cart-toast" class="cart-toast" aria-hidden="true">
+    <div class="cart-toast__icon">✓</div>
+
+    <div class="cart-toast__content">
+        <div class="cart-toast__title">Товар добавлен в корзину</div>
+        <div class="cart-toast__text">Можете продолжить покупки или перейти в корзину.</div>
+    </div>
+
+    <a href="{% url 'cart' %}" class="cart-toast__link">В корзину</a>
+
+    <button type="button" class="cart-toast__close" id="cart-toast-close" aria-label="Закрыть">
+        ×
+    </button>
+</div>
+
 <script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie("csrftoken");
+
+    const qtyInput = document.getElementById("product-qty-input");
+    const addToCartForm = document.getElementById("add-to-cart-form");
+    const stockValueEl = document.getElementById("product-stock-value");
+    const cartHint = document.getElementById("product-cart-hint");
+
+    const cartToast = document.getElementById("cart-toast");
+    const cartToastClose = document.getElementById("cart-toast-close");
+    let cartToastTimer = null;
+
+    function showProductHint(message, isError = false) {
+        if (!cartHint) return;
+        cartHint.textContent = message;
+        cartHint.style.display = "block";
+        cartHint.style.color = isError ? "#ffb4a6" : "var(--muted)";
+    }
+
+    function clearProductHint() {
+        if (!cartHint) return;
+        cartHint.textContent = "";
+        cartHint.style.display = "none";
+    }
+
+    function updateHeaderCartCount(countToAdd) {
+        const cartCountEl = document.querySelector(".cart-count");
+        if (!cartCountEl) return;
+
+        const current = parseInt(cartCountEl.textContent || "0", 10);
+        const next = current + countToAdd;
+        cartCountEl.textContent = next > 0 ? next : 0;
+    }
+
+    function showCartToast() {
+        if (!cartToast) return;
+
+        cartToast.classList.add("cart-toast--show");
+        cartToast.setAttribute("aria-hidden", "false");
+
+        if (cartToastTimer) {
+            clearTimeout(cartToastTimer);
+        }
+
+        cartToastTimer = setTimeout(() => {
+            hideCartToast();
+        }, 2600);
+    }
+
+    function hideCartToast() {
+        if (!cartToast) return;
+        cartToast.classList.remove("cart-toast--show");
+        cartToast.setAttribute("aria-hidden", "true");
+    }
+
+    cartToastClose?.addEventListener("click", hideCartToast);
+
+    if (qtyInput) {
+        qtyInput.addEventListener("input", function () {
+            const max = parseInt(qtyInput.getAttribute("max") || "1", 10);
+            let value = parseInt(qtyInput.value || "1", 10);
+
+            if (isNaN(value) || value < 1) value = 1;
+            if (value > max) value = max;
+
+            qtyInput.value = value;
+        });
+    }
+
+    if (addToCartForm) {
+        addToCartForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            clearProductHint();
+
+            const maxStock = parseInt(qtyInput.getAttribute("max") || "0", 10);
+            const quantity = parseInt(qtyInput.value || "1", 10);
+
+            if (maxStock <= 0) {
+                showProductHint("Товар отсутствует на складе.", true);
+                return;
+            }
+
+            if (quantity > maxStock) {
+                qtyInput.value = maxStock;
+                showProductHint(`Максимально доступно: ${maxStock} шт.`, true);
+                return;
+            }
+
+            const formData = new FormData(addToCartForm);
+
+            try {
+                const response = await fetch(addToCartForm.action, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrftoken,
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Accept": "application/json",
+                    },
+                    body: formData,
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (data.detail) {
+                        showProductHint(data.detail, true);
+
+                        if (typeof data.detail === "string" && data.detail.includes("В наличии только")) {
+                            const match = data.detail.match(/(\d+)/);
+                            if (match && qtyInput) {
+                                qtyInput.max = match[1];
+                                if (parseInt(qtyInput.value, 10) > parseInt(match[1], 10)) {
+                                    qtyInput.value = match[1];
+                                }
+                                if (stockValueEl) {
+                                    stockValueEl.textContent = match[1];
+                                }
+                            }
+                        }
+                    } else if (data.errors) {
+                        const firstKey = Object.keys(data.errors)[0];
+                        const firstError = data.errors[firstKey]?.[0] || "Ошибка добавления товара";
+                        showProductHint(firstError, true);
+                    } else {
+                        showProductHint("Не удалось добавить товар в корзину.", true);
+                    }
+                    return;
+                }
+
+                if (data.stock !== undefined && data.stock !== null) {
+                    qtyInput.max = data.stock;
+                    if (stockValueEl) {
+                        stockValueEl.textContent = data.stock;
+                    }
+                }
+
+                updateHeaderCartCount(quantity);
+                showCartToast();
+            } catch (error) {
+                showProductHint("Произошла ошибка при добавлении товара в корзину.", true);
+            }
+        });
+    }
+
     (function () {
         const carousel = document.querySelector("[data-carousel]");
         if (!carousel) return;
@@ -84,12 +277,12 @@
             });
         };
 
-        prevBtn.addEventListener("click", () => {
+        prevBtn?.addEventListener("click", () => {
             index = (index - 1 + items.length) % items.length;
             render();
         });
 
-        nextBtn.addEventListener("click", () => {
+        nextBtn?.addEventListener("click", () => {
             index = (index + 1) % items.length;
             render();
         });
@@ -98,3 +291,5 @@
     })();
 </script>
 
+</body>
+</html>

@@ -9,4 +9,6 @@ def cart_items_count(request):
     if not cart:
         return {"cart_items_count": 0}
 
-    return {"cart_items_count": cart.items.count()}
+    total_quantity = sum(item.quantity for item in cart.items.all())
+
+    return {"cart_items_count": total_quantity}

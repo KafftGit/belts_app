@@ -1,30 +1,27 @@
-# from django import forms
-
-
-# class CartCreateForm(forms.Form):
-#     quantity = forms.IntegerField(initial=1)
-#     product = forms.IntegerField(widget=forms.HiddenInput())
-
-
-# class CartItemDeleteForm(forms.Form):
-#     product = forms.IntegerField(widget=forms.HiddenInput())
-
-
-# class CartCompleteForm(forms.Form):
-#     address = forms.CharField()
-#     extra_notes = forms.CharField(required=False)
 from django import forms
 
 
 class CartCreateForm(forms.Form):
+    product = forms.IntegerField(widget=forms.HiddenInput())
     quantity = forms.IntegerField(min_value=1, initial=1)
     unit_price = forms.IntegerField()
-    product = forms.IntegerField(widget=forms.HiddenInput())
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data["quantity"]
+        if quantity < 1:
+            raise forms.ValidationError("Количество должно быть не меньше 1")
+        return quantity
 
 
 class CartItemUpdateForm(forms.Form):
     product = forms.IntegerField(widget=forms.HiddenInput())
     quantity = forms.IntegerField(min_value=1)
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data["quantity"]
+        if quantity < 1:
+            raise forms.ValidationError("Количество должно быть не меньше 1")
+        return quantity
 
 
 class CartItemDeleteForm(forms.Form):
